@@ -1,19 +1,29 @@
 chars = input().split(', ')
-word = input()
+target = input()
 
-ll = []
+expression = []
+phrase_combinations = []
 
 
-def compare_chars(start_idx, lll):
+def cycling_thru_chars(curr_target):
     for char in chars:
-        if char in word:
-            for i in range(len(word)):
-                if i == 0 and char == word[i: i + len(char)]:
-                    ll.append(char)
-                    start_idx = i + len(char)
-                    lll.remove(char)
-                    compare_chars(start_idx, lll)
+        if char in curr_target:
+            if curr_target.index(char) == 0:
+                if char not in expression:
+                    expression.append(char)
+                    if ''.join(expression) in target:
+                        if ''.join(expression) == target:
+                            temp = ' '.join(expression)
+                            if temp not in phrase_combinations:
+                                phrase_combinations.append(temp)
+                                print(temp)
+                                del expression[-1]
+                            else:
+                                cycling_thru_chars(curr_target[len(char):])
+                                del expression[-1]
+                        else:
+                            cycling_thru_chars(curr_target[len(char):])
+                            del expression[-1]
 
 
-compare_chars(0, chars)
-print(chars)
+cycling_thru_chars(target)
