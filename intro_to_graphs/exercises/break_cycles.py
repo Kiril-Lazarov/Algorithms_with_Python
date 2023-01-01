@@ -1,39 +1,48 @@
 n = int(input())
+
 graph = {}
-erased_values = {}
-visited = []
-'''{1: [2, 5, 4], 2: [1, 3], 3: [2, 5], 
-4: [1], 5: [1, 3], 6: [7, 8], 7: [6, 8], 8: [6, 7]}'''
-is_cycle = False
-result = {}
-def dfs(node, previous_node, check_node):
-    if node not in visited:
-        visited.append(node)
-    for child in graph[node]:
-        if child != previous_node:
-            if child not in graph[check_node]:
-                if child == check_node:
-                    if child not in result:
-                        # graph[node].remove(child)
-                        result[child] = node
-                        print(visited)
-                        is_cycle = True
-                        break
-            previous_node = node
-            dfs(child, previous_node, check_node)
-            break
-
-
+edges = []
+final_edges = []
 for _ in range(n):
-    key, value = input().split(' -> ')
-    graph[key] = value.split()
-print(graph)
-while True:
-    for node in graph:
-        previous_node = node
-        check_node = node
+    line = input().split(' -> ')
+    node = line[0]
+    children = line[1].split(' ')
+    graph[line[0]] = children
+    for child in children:
+        edges.append((node, child))
 
-        dfs(node, previous_node, check_node)
-        if is_cycle:
-            pass
 
+def dfs(node, destination, visited, graph):
+    if node in visited:
+        return
+    visited.append(node)
+    if node == destination:
+        return
+
+    for child in graph[node]:
+        dfs(child, destination, visited, graph)
+
+
+def path_exists(source, destination, graph):
+    visited = []
+
+    dfs(source, destination, visited, graph)
+    return destination in visited
+
+
+for source, destination in sorted(edges, key=lambda x: (x[0], x[1])):
+    if destination not in graph[source] or source not in graph[destination]:
+        continue
+
+    graph[source].remove(destination)
+    graph[destination].remove(source)
+
+    if path_exists(source, destination, graph):
+        final_edges.append((source, destination))
+
+    else:
+        graph[source].append(destination)
+        graph[destination].append(source)
+
+print(f'Edges to remove: {len(final_edges)}')
+[print(' - '.join(edge)) for edge in final_edges]
