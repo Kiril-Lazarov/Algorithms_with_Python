@@ -1,50 +1,37 @@
-nodes = int(input())
-edges = int(input())
-graph = []
-for i in range(edges):
-    destination, source = [int(x) for x in input().split()]
-    graph.append((destination, source))
-start_point, end_point = int(input()), int(input())
+from collections import deque
+
+nodes, edges = int(input()), int(input())
+
+graph = {}
+
+for _ in range(edges):
+    node, edge = [int(x) for x in input().split()]
+    if node not in graph:
+        graph[node] = []
+    graph[node].append(edge)
+start, end = int(input()), int(input())
+# print(graph)
+queue = deque()
+
+queue.append(start)
+output = []
+visited = []
+is_found = False
+while queue:
+    node = queue.pop()
+    if node not in visited and node in graph:
+        output.append(node)
+        visited.append(node)
+        for child in graph[node]:
+            queue.append(child)
+            if child == end:
+                is_found = True
+                output.append(child)
+                break
+        if is_found:
+            break
+print(f'Shortest path length is: {len(output) - 1}')
+print(*output, sep=' ')
 
 
-graph_dict = {}
-for destination, source in graph:
-    if destination not in graph_dict:
-        graph_dict[destination] = []
-    graph_dict[destination].append(source)
 
-path = []
-total_path = []
-
-
-def dfs(destination):
-    if destination not in path:
-        path.append(destination)
-    for edge in graph_dict[destination]:
-        if edge in graph_dict:
-            if edge == end_point:
-                path.append(edge)
-                total_path.append(tuple(path))
-                path.pop()
-            else:
-                dfs(edge)
-                path.pop()
-        else:
-            path.append(edge)
-            total_path.append(tuple(path))
-            path.pop()
-
-
-
-for destination, source in graph_dict.items():
-    if destination == start_point:
-        dfs(destination)
-filtered_path = {}
-for paths in total_path:
-    if paths[0] == start_point and paths[-1] == end_point:
-        filtered_path[len(paths)] = paths
-
-min_value = min(filtered_path.keys())
-shortest_path = filtered_path[min_value]
-print(f'Shortest path length is: {min_value -1}')
-print(' '.join(str(x) for x in filtered_path[min_value]))
