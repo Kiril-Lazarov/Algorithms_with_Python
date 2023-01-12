@@ -1,44 +1,58 @@
-n = int(input())
-graph_dict = {}
-max_node = 0
-for _ in range(n):
-    source, destination, weight = [int(x) for x in input().split(', ')]
-    if source not in graph_dict:
-        graph_dict[source] = []
-    graph_dict[source].append([weight, destination])
-    if max_node < source:
-        max_node = source
 
-start, end = int(input()), int(input())
+from collections import deque
+from queue import PriorityQueue
 
-destinations = [float('inf')] * (max_node + 1)
 
-path = []
-min_path_dict = {}
-for node, values in graph_dict.items():
-    for items in values:
-        weight, destination = items
-        if node == start:
-            previous_node_path = 0
-            if node not in min_path_dict:
-                min_path_dict[node] = []
+class Dijkstra:
+    def __init__(self, node, child, weight):
+        self.node = node
+        self.child = child
+        self.weight = weight
 
-        else:
-            if not min_path_dict:
-                continue
-            previous_node_path = destinations[node]
-        if weight + previous_node_path < destinations[destination]:
-            destinations[destination] = weight + previous_node_path
-            path.append((node, destination))
-            if destination not in min_path_dict:
-                min_path_dict[destination] = []
-            min_path_dict[destination] = min_path_dict[node] + [node]
-        if destination == end:
-            break
 
-if destinations[end] != float('inf'):
-    min_path_dict[end].append(end)
-    print(destinations[end])
-    print(' '.join([str(x) for x in min_path_dict[end]]))
-else:
+edges = int(input())
+
+graph = {}
+
+for _ in range(edges):
+    node, child, weight = (int(x) for x in input().split(', '))
+    if node not in graph:
+        graph[node] = []
+    graph[node].append((child, weight))
+
+start, target = int(input()), int(input())
+
+parents = ['-'] * (max(graph) + 1)
+d = [float('inf')] * (max(graph) + 1)
+
+queue = PriorityQueue()
+queue.put(list((start, 0)))
+
+while not queue.empty():
+    distance, node = queue.get()
+
+    if node == target:
+        break
+    if node not in graph:
+        continue
+    for child in graph[node]:
+        new_distance = distance + child[1]
+        if new_distance < d[child[0]]:
+            d[child[0]] = new_distance
+            parents[child[0]] = node
+
+            queue.put(list((new_distance, child[0])))
+
+if queue.empty():
     print('There is no such path.')
+
+else:
+    end = target
+    final = deque()
+    while end != start:
+        final.appendleft(end)
+        new_index = parents[end]
+        end = new_index
+    final.appendleft(start)
+    print(d[target])
+    print(' '.join(str(x) for x in list(final)))
