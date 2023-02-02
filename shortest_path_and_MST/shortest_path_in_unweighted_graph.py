@@ -10,7 +10,7 @@ for _ in range(edges):
         graph[node] = []
     graph[node].append(edge)
 start, end = int(input()), int(input())
-# print(graph)
+
 queue = deque()
 
 queue.append(start)
@@ -19,9 +19,8 @@ visited = []
 is_found = False
 while queue:
     node = queue.pop()
-    if node not in visited and node in graph:
-        output.append(node)
-        visited.append(node)
+    if node not in output and node in graph:
+
         for child in graph[node]:
             queue.append(child)
             if child == end:
@@ -32,6 +31,3 @@ while queue:
             break
 print(f'Shortest path length is: {len(output) - 1}')
 print(*output, sep=' ')
-
-
-
